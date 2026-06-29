@@ -37,6 +37,8 @@ Then scp/USB the `dist/` binary to the target. No network needed there ever agai
 > Prefer not to install your shell rc yet? `prettiest install --no-wire` unpacks everything
 > but touches nothing — test it in one shell with `. ~/.config/prettiest/prettiest.sh`.
 
+> **Stuck?** See the [FAQ](assets/config/FAQ.md) — boxes instead of icons, prompt not changing, building from a clone, switching themes. (It's also installed to `~/.config/prettiest/FAQ.md`.)
+
 ## What's inside the binary
 
 - **Tools:** eza, bat, fd, ripgrep, dust, duf, procs, fzf, zoxide, starship, git-delta (+ btop on Linux)
