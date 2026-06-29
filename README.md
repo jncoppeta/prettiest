@@ -40,7 +40,7 @@ Then restart your shell, and set your terminal font to **MesloLGS Nerd Font**.
 
 ```sh
 prettiest install              # tools + themes + shell/git wiring
-prettiest theme <flavor>       # mocha (default) · macchiato · frappe · latte
+prettiest theme <colorway>     # catppuccin (default) · gruvbox · tokyonight · mono
 prettiest doctor               # what's installed / wired / missing
 prettiest uninstall            # remove wiring + configs (keeps the tools)
 ```
@@ -52,8 +52,10 @@ prettiest uninstall            # remove wiring + configs (keeps the tools)
   Opt out per-shell with `export PRETTIEST_NO_ALIASES=1` before it's sourced.
 - **One source line** is added to `~/.zshrc`/`~/.bashrc`; it sources `~/.config/prettiest/prettiest.sh`,
   which sets the theme env, aliases, and inits starship/zoxide/fzf for your shell.
-- **Themes** are fetched from the upstream Catppuccin repos (bat, btop, delta) at install time;
-  starship palettes ship inline in `config/starship.toml`. `prettiest theme` flips the active flavor everywhere.
+- **Colorways** (`catppuccin` · `gruvbox` · `tokyonight` · `mono`, matching system-hud) ship as
+  inline starship palettes; `prettiest theme <name>` recolors prompt + bat + delta + btop + fzf together.
+  Catppuccin theme files for bat/btop/delta are fetched from upstream at install; the other colorways
+  use the tools' built-in themes.
 - **git diffs** route through delta via an `[include]` added to `~/.gitconfig`.
 
 ## Layout
@@ -66,7 +68,7 @@ prettiest/
   install.sh           # bootstrap → bin/prettiest install
   config/
     prettiest.sh       # shell integration (aliases, env, init)
-    starship.toml      # Catppuccin prompt (4 palettes embedded)
+    starship.toml      # plain full-path prompt (4 colorway palettes embedded)
     bat/config         # bat defaults
     delta/             # active + fetched Catppuccin gitconfig (created on install)
 ```
@@ -74,5 +76,6 @@ prettiest/
 ## Notes & limits
 
 - macOS-first (Homebrew). Linux is best-effort; on Debian, `bat`→`batcat` and `fd`→`fdfind` are aliased back automatically.
-- Theme switching covers the four **Catppuccin** flavors (coherent everywhere). Other palettes aren't bundled.
+- Four colorways (`catppuccin`/`gruvbox`/`tokyonight`/`mono`). Prompt + bat + fzf are fully themed per
+  colorway; btop/delta are best-effort for the non-catppuccin ones (tool built-in themes).
 - Not affiliated with Prettier or Catppuccin — just standing on their shoulders.

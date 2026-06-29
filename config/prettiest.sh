@@ -13,20 +13,20 @@ else _PRETTI_SHELL=sh; fi
 if _pretti_have batcat && ! _pretti_have bat; then _PRETTI_BAT=batcat; else _PRETTI_BAT=bat; fi
 if _pretti_have fdfind && ! _pretti_have fd; then _PRETTI_FD=fdfind; else _PRETTI_FD=fd; fi
 
-# --- active Catppuccin flavor (written by `prettiest theme`) ---
+# --- active colorway (written by `prettiest theme`; matches system-hud's set) ---
 _PRETTI_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/prettiest"
-_PRETTI_FLAVOR="$(cat "$_PRETTI_DIR/theme" 2>/dev/null || echo mocha)"
-case "$_PRETTI_FLAVOR" in
-  latte)
-    export BAT_THEME="Catppuccin Latte"
-    _PRETTI_FZF="--color=bg+:#ccd0da,bg:#eff1f5,spinner:#dc8a78,hl:#d20f39,fg:#4c4f69,header:#d20f39,info:#8839ef,pointer:#dc8a78,marker:#dc8a78,fg+:#4c4f69,prompt:#8839ef,hl+:#d20f39" ;;
-  frappe)
-    export BAT_THEME="Catppuccin Frappe"
-    _PRETTI_FZF="--color=bg+:#414559,bg:#303446,spinner:#f2d5cf,hl:#e78284,fg:#c6d0f5,header:#e78284,info:#ca9ee6,pointer:#f2d5cf,marker:#f2d5cf,fg+:#c6d0f5,prompt:#ca9ee6,hl+:#e78284" ;;
-  macchiato)
-    export BAT_THEME="Catppuccin Macchiato"
-    _PRETTI_FZF="--color=bg+:#363a4f,bg:#24273a,spinner:#f4dbd6,hl:#ed8796,fg:#cad3f5,header:#ed8796,info:#c6a0f6,pointer:#f4dbd6,marker:#f4dbd6,fg+:#cad3f5,prompt:#c6a0f6,hl+:#ed8796" ;;
-  *) # mocha (default)
+_PRETTI_CW="$(cat "$_PRETTI_DIR/theme" 2>/dev/null || echo catppuccin)"
+case "$_PRETTI_CW" in
+  gruvbox)
+    export BAT_THEME="gruvbox-dark"
+    _PRETTI_FZF="--color=bg+:#3c3836,bg:#282828,spinner:#fb4934,hl:#fabd2f,fg:#ebdbb2,header:#fabd2f,info:#83a598,pointer:#fb4934,marker:#fe8019,fg+:#ebdbb2,prompt:#83a598,hl+:#fabd2f" ;;
+  tokyonight)
+    export BAT_THEME="TwoDark"
+    _PRETTI_FZF="--color=bg+:#292e42,bg:#1a1b26,spinner:#bb9af7,hl:#7aa2f7,fg:#c0caf5,header:#7aa2f7,info:#7dcfff,pointer:#bb9af7,marker:#9ece6a,fg+:#c0caf5,prompt:#7dcfff,hl+:#7aa2f7" ;;
+  mono)
+    export BAT_THEME="ansi"
+    _PRETTI_FZF="--color=bg+:#3a3a3a,bg:#1c1c1c,spinner:#dddddd,hl:#ffffff,fg:#cccccc,header:#ffffff,info:#999999,pointer:#ffffff,marker:#ffffff,fg+:#ffffff,prompt:#999999,hl+:#ffffff" ;;
+  *) # catppuccin (default)
     export BAT_THEME="Catppuccin Mocha"
     _PRETTI_FZF="--color=bg+:#313244,bg:#1e1e2e,spinner:#f5e0dc,hl:#f38ba8,fg:#cdd6f4,header:#f38ba8,info:#cba6f7,pointer:#f5e0dc,marker:#f5e0dc,fg+:#cdd6f4,prompt:#cba6f7,hl+:#f38ba8" ;;
 esac
