@@ -129,15 +129,25 @@ wire_git(){
 }
 
 cmd_install(){
+  local wire=1
+  [ "${1:-}" = "--no-wire" ] && wire=0
   install_tools
   install_configs
   install_themes
-  echo "mocha" > "$DEST/theme"
-  wire_shell
-  wire_git
-  echo
-  ok "prettiest installed. Restart your shell, or:  source \"$DEST/prettiest.sh\""
-  [ "$(os)" = mac ] && say "set your terminal font to 'MesloLGS Nerd Font' for icons/glyphs"
+  [ -f "$DEST/theme" ] || echo "mocha" > "$DEST/theme"
+  if [ "$wire" = 1 ]; then
+    wire_shell
+    wire_git
+    echo
+    ok "prettiest installed. Restart your shell, or:  source \"$DEST/prettiest.sh\""
+  else
+    write_delta_active "$(cat "$DEST/theme")"
+    echo
+    ok "prettiest staged (no shell/git wiring touched)."
+    say "test it in a separate terminal — run:  source \"$DEST/prettiest.sh\""
+    say "make it permanent later with:  prettiest install"
+  fi
+  [ "$(os)" = mac ] && say "set that terminal's font to 'MesloLGS Nerd Font' for icons/glyphs"
 }
 
 # ---------- theme ----------
@@ -192,6 +202,8 @@ cmd_help(){ cat <<EOF
 prettiest — modern CLI tools + coordinated Catppuccin pretty.
 
   prettiest install            install tools, fetch themes, wire shell + git
+  prettiest install --no-wire  install tools + themes WITHOUT touching shell/git
+                               (then test in one terminal: source ~/.config/prettiest/prettiest.sh)
   prettiest theme <flavor>     switch Catppuccin flavor: $FLAVORS
   prettiest doctor             report what's installed / wired
   prettiest uninstall          remove wiring + configs (keeps tools)
@@ -202,7 +214,7 @@ EOF
 }
 
 case "${1:-help}" in
-  install) cmd_install ;;
+  install) shift; cmd_install "${1:-}" ;;
   theme) shift; cmd_theme "${1:-}" ;;
   doctor) cmd_doctor ;;
   uninstall) cmd_uninstall ;;
