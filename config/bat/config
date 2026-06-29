@@ -1,0 +1,5 @@
+# prettiest — bat config (copied to `bat --config-dir`/config).
+# Theme is set via BAT_THEME in prettiest.sh (flavor-aware), but pin a default here too.
+--theme="Catppuccin Mocha"
+--style="numbers,changes,header"
+--italic-text=always

@@ -1,0 +1,17 @@
+# prettiest — Linux package map (best-effort; macOS uses Brewfile instead).
+# Format: <tool> <apt-package-or-"-"> <cargo-crate-or-"-">
+# `prettiest install` installs apt packages first, then cargo crates for the rest.
+# Note: on Debian/Ubuntu `bat`->`batcat` and `fd`->`fdfind`; prettiest.sh aliases them back.
+
+eza        -            eza
+bat        bat          -
+git-delta  -            git-delta
+duf        duf          -
+dust       -            du-dust
+procs      -            procs
+fd         fd-find      -
+ripgrep    ripgrep      -
+btop       btop         -
+fzf        fzf          -
+zoxide     zoxide       -
+# starship: installed via https://starship.rs/install.sh (not apt/cargo)
