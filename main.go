@@ -116,6 +116,8 @@ func extractConfigs() {
 	cfg := configHome()
 	// shell integration
 	mustWrite(filepath.Join(cfg, "prettiest", "prettiest.sh"), data("assets/config/prettiest.sh"), 0o644)
+	// FAQ (travels with the binary)
+	mustWrite(filepath.Join(cfg, "prettiest", "FAQ.md"), data("assets/config/FAQ.md"), 0o644)
 	// starship
 	st := filepath.Join(cfg, "starship.toml")
 	backup(st)
