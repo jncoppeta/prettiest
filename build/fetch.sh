@@ -38,9 +38,27 @@ curl -fsSL "https://github.com/muesli/duf/releases/download/v${dv}/duf_${dv}_${d
   | tar xz -C "$dest" duf 2>/dev/null || echo "   (duf fetch best-effort; skip if it fails)"
 
 if [ -n "$btop" ]; then
-  echo "==> btop (linux only)"
-  curl -fsSL "https://github.com/aristocratos/btop/releases/latest/download/btop-${btop}.tbz" \
-    | tar xj -C "$dest" --strip-components=2 btop/bin/btop 2>/dev/null || echo "   (btop fetch best-effort)"
+  # Linux-only extras that lack a binstall prebuilt for this triple.
+  echo "==> procs (linux, from GitHub release)"
+  pv=$(gh_latest dalance/procs)
+  tmp=$(mktemp -d)
+  if curl -fsSL "https://github.com/dalance/procs/releases/download/v${pv}/procs-v${pv}-x86_64-linux.zip" -o "$tmp/p.zip" \
+     && unzip -joq "$tmp/p.zip" procs -d "$tmp"; then
+    cp "$tmp/procs" "$dest/procs"
+  else warn "procs fetch failed"; fi
+  rm -rf "$tmp"
+
+  echo "==> btop (linux, asset URL resolved from API)"
+  burl=$(curl -fsSL https://api.github.com/repos/aristocratos/btop/releases/latest \
+         | grep -o 'https://[^"]*btop-x86_64-unknown-linux-musl\.tar\.gz' | head -1)
+  if [ -n "$burl" ]; then
+    tmp=$(mktemp -d)
+    if curl -fsSL "$burl" | tar xz -C "$tmp" 2>/dev/null; then
+      f=$(find "$tmp" -type f -name btop -perm -u+x | head -1)
+      [ -n "$f" ] && cp "$f" "$dest/btop" || warn "btop binary not found in archive"
+    else warn "btop download failed"; fi
+    rm -rf "$tmp"
+  else warn "btop asset URL not found"; fi
 fi
 
 echo "==> Nerd Font (MesloLGS NF)"
