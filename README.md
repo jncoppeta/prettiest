@@ -47,7 +47,8 @@ prettiest uninstall            # remove wiring + configs (keeps the tools)
 
 ## How it works
 
-- **Aliases (shadowing):** `prettiest.sh` aliases `ls`→eza, `cat`→bat, `cd`→zoxide, `du`→dust, etc.
+- **Aliases (shadowing):** `prettiest.sh` aliases `ls`/`ll`→eza, `cat`→bat, `grep`→rg, `du`→dust, `df`→duf.
+  `cd`/`ps`/`top` are left native; zoxide adds `z`/`zi` alongside `cd`.
   Opt out per-shell with `export PRETTIEST_NO_ALIASES=1` before it's sourced.
 - **One source line** is added to `~/.zshrc`/`~/.bashrc`; it sources `~/.config/prettiest/prettiest.sh`,
   which sets the theme env, aliases, and inits starship/zoxide/fzf for your shell.

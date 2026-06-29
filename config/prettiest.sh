@@ -37,17 +37,12 @@ _pretti_have "$_PRETTI_FD" && export FZF_DEFAULT_COMMAND="$_PRETTI_FD --type f -
 if [ -z "${PRETTIEST_NO_ALIASES:-}" ]; then
   if _pretti_have eza; then
     alias ls='eza --group-directories-first --icons=auto'
-    alias ll='eza -lah --group-directories-first --icons=auto --git'
-    alias la='eza -a  --group-directories-first --icons=auto'
-    alias lt='eza --tree --level=2 --icons=auto'
+    alias ll='eza -lah --git --group-directories-first --icons=auto'   # long+all view (≈ ls -lach)
   fi
   _pretti_have "$_PRETTI_BAT" && alias cat="$_PRETTI_BAT --paging=never"
-  [ "$_PRETTI_FD" = fdfind ] && alias fd='fdfind'
-  _pretti_have rg    && alias grep='rg'
-  _pretti_have dust  && alias du='dust'
-  _pretti_have duf   && alias df='duf'
-  _pretti_have procs && alias ps='procs'
-  _pretti_have btop  && { alias top='btop'; alias htop='btop'; }
+  _pretti_have rg   && alias grep='rg'
+  _pretti_have dust && alias du='dust'
+  _pretti_have duf  && alias df='duf'
 fi
 
 # --- prompt, smart-cd, fuzzy (interactive shells only; these need a TTY/ZLE) ---
@@ -57,8 +52,8 @@ case $- in
       export STARSHIP_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/starship.toml"
       eval "$(starship init "$_PRETTI_SHELL")"
     fi
-    # zoxide shadows cd (still behaves like cd, but learns + enables `z`/`zi`)
-    _pretti_have zoxide && [ "$_PRETTI_SHELL" != sh ] && eval "$(zoxide init "$_PRETTI_SHELL" --cmd cd)"
+    # zoxide adds `z`/`zi` (does NOT shadow cd; native cd is left alone)
+    _pretti_have zoxide && [ "$_PRETTI_SHELL" != sh ] && eval "$(zoxide init "$_PRETTI_SHELL")"
     # fzf key bindings + completion (modern fzf >= 0.48)
     _pretti_have fzf && [ "$_PRETTI_SHELL" != sh ] && eval "$(fzf --"$_PRETTI_SHELL" 2>/dev/null)"
     ;;
