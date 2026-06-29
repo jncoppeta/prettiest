@@ -23,11 +23,28 @@ have(){ command -v "$1" >/dev/null 2>&1; }
 backup(){ [ -f "$1" ] || return 0; cp "$1" "$1.bak.$(date +%Y%m%d%H%M%S)"; say "backed up $1"; }
 
 # ---------- install: tools ----------
+RUST_TOOLS="eza ripgrep fd-find bat git-delta du-dust procs zoxide starship"  # cargo crate names
+install_rust_prebuilt(){ # fast prebuilt binaries; avoids brew source builds (e.g. eza->pandoc->GHC)
+  have cargo || { warn "cargo not found — install rustup for fast prebuilt installs"; return 1; }
+  if ! command -v cargo-binstall >/dev/null 2>&1 && [ ! -x "$HOME/.cargo/bin/cargo-binstall" ]; then
+    say "installing cargo-binstall…"
+    curl -L --proto '=https' --tlsv1.2 -fsSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash
+  fi
+  "$HOME/.cargo/bin/cargo-binstall" -y $RUST_TOOLS || warn "some prebuilt installs failed"
+}
 install_tools(){
   say "installing tools…"
   if [ "$(os)" = mac ]; then
     have brew || die "Homebrew required — see https://brew.sh"
-    brew bundle --file "$ROOT/Brewfile"
+    # Rust tools: prebuilt binaries (brew would source-build eza->pandoc->GHC on older macOS).
+    if ! install_rust_prebuilt; then
+      warn "falling back to brew bundle (may compile from source)"; brew bundle --file "$ROOT/Brewfile"
+    fi
+    # Non-Rust + font via brew (bottled/quick); btop is optional (C++ source build on old macOS).
+    brew list --cask font-meslo-lg-nerd-font >/dev/null 2>&1 || brew install --cask font-meslo-lg-nerd-font || warn "font cask failed"
+    have duf || brew install duf || warn "duf failed"
+    have fzf || brew install fzf || warn "fzf failed"
+    have btop || warn "btop optional & not installed — add later with: brew install btop"
   elif [ "$(os)" = linux ]; then
     if have apt-get; then
       sudo apt-get update -qq || true
@@ -50,7 +67,7 @@ install_tools(){
 
 # ---------- install: configs ----------
 install_configs(){
-  say "placing configs into $DEST…"
+  say "placing configs into ${DEST}…"
   mkdir -p "$DEST" "$XDG/bat/themes" "$XDG/btop/themes"
   cp "$SRC/prettiest.sh" "$DEST/prettiest.sh"
   # starship

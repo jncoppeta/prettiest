@@ -50,14 +50,18 @@ if [ -z "${PRETTIEST_NO_ALIASES:-}" ]; then
   _pretti_have btop  && { alias top='btop'; alias htop='btop'; }
 fi
 
-# --- prompt, smart-cd, fuzzy (init last) ---
-if _pretti_have starship; then
-  export STARSHIP_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/starship.toml"
-  eval "$(starship init "$_PRETTI_SHELL")"
-fi
-# zoxide shadows cd (still behaves like cd, but learns + enables `z`/`zi`)
-_pretti_have zoxide && [ "$_PRETTI_SHELL" != sh ] && eval "$(zoxide init "$_PRETTI_SHELL" --cmd cd)"
-# fzf key bindings + completion (modern fzf >= 0.48)
-_pretti_have fzf && [ "$_PRETTI_SHELL" != sh ] && eval "$(fzf --"$_PRETTI_SHELL" 2>/dev/null)"
+# --- prompt, smart-cd, fuzzy (interactive shells only; these need a TTY/ZLE) ---
+case $- in
+  *i*)
+    if _pretti_have starship; then
+      export STARSHIP_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/starship.toml"
+      eval "$(starship init "$_PRETTI_SHELL")"
+    fi
+    # zoxide shadows cd (still behaves like cd, but learns + enables `z`/`zi`)
+    _pretti_have zoxide && [ "$_PRETTI_SHELL" != sh ] && eval "$(zoxide init "$_PRETTI_SHELL" --cmd cd)"
+    # fzf key bindings + completion (modern fzf >= 0.48)
+    _pretti_have fzf && [ "$_PRETTI_SHELL" != sh ] && eval "$(fzf --"$_PRETTI_SHELL" 2>/dev/null)"
+    ;;
+esac
 
 unset _PRETTI_FZF
