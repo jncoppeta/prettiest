@@ -4,3 +4,10 @@
 .vscode/
 .idea/
 *.bak.*
+# embedded payload is fetched/populated at build time
+assets/bin/
+assets/fonts/
+# build outputs
+/dist/
+/prettiest
+/prettiest-*

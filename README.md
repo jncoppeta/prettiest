@@ -1,81 +1,72 @@
 # prettiest
 
-> Make your terminal the prettiest. One command bundles a modern CLI toolset **and** drops in coordinated [Catppuccin](https://catppuccin.com)-themed configs — the part the "modern-unix" lists leave to you.
+> One self-contained binary that makes any terminal pretty — **fully offline**. Carry it to a machine, run `prettiest install`, and it unpacks a modern CLI toolset, a Starship prompt, coordinated Catppuccin themes, and a Nerd Font — no network, no package manager.
 
-The lists tell you to install `eza`, `bat`, `ripgrep`… then leave you to theme and wire everything by hand. `prettiest` does the whole thing: installs the tools, a prompt, a Nerd Font, themed configs for every tool, and the shell glue — all matching, all reversible.
+Built for **reusable, disconnected environments**: install WezTerm once per machine, drop the `prettiest` binary, run it. Everything it needs is embedded inside the binary.
 
 ```
 $ prettiest install
 ```
 
-## What you get
+## What's inside the binary
 
-**Tools** (your list + the glue that actually makes output pretty):
+- **Tools:** eza, bat, fd, ripgrep, dust, duf, procs, fzf, zoxide, starship, git-delta (+ btop on Linux)
+- **Configs:** plain full-path Starship prompt, `prettiest.sh` shell integration (aliases + init)
+- **Themes:** Catppuccin (bat/delta/btop) — other colorways use the tools' built-ins
+- **Font:** MesloLGS Nerd Font (icons/glyphs)
+- **Optional** portable `wezterm.lua` that loads the bundled font without a system install
 
-| Replaces | Tool | | Replaces | Tool |
-|---|---|---|---|---|
-| `ls`   | eza       | | `ps`     | procs |
-| `cat`  | bat       | | `top`    | btop |
-| `find` | fd        | | prompt   | **starship** |
-| `grep` | ripgrep   | | fuzzy    | **fzf** |
-| `du`   | dust      | | smart cd | **zoxide** |
-| `df`   | duf       | | diffs    | git-delta |
+On `install` it unpacks to `~/.prettiest/bin`, drops configs under `~/.config`, installs the font, and adds **one block** to your `~/.zshrc`/`~/.bashrc` (prepends `~/.prettiest/bin` to `PATH` + sources the integration) and a delta `[include]` to `~/.gitconfig`. All backed up, all reversible.
 
-Plus the **MesloLGS Nerd Font** (icons/glyphs) and **Catppuccin** themes wired into starship, bat, delta, btop, fzf — one coherent palette.
-
-## Install
+## Use it (on the target machine, offline)
 
 ```sh
-git clone https://github.com/jncoppeta/prettiest.git
-cd prettiest && ./install.sh
+prettiest install            # unpack + wire shell & git
+prettiest install --no-wire  # unpack only — test in one shell, touch nothing
+prettiest theme <colorway>   # catppuccin (default) · gruvbox · tokyonight · mono
+prettiest doctor             # what's unpacked / wired
+prettiest uninstall          # remove wiring + ~/.prettiest (keeps system fonts)
 ```
 
-- **macOS:** installs via `brew bundle` (`Brewfile`).
-- **Linux:** `apt` + `cargo` (best-effort, per `packages.txt`) + starship's installer.
+Then restart your shell. For icons, set WezTerm's font to **MesloLGS Nerd Font** — or
+`ln -sf ~/.prettiest/wezterm.lua ~/.wezterm.lua` to use the bundled config (loads the font from `~/.prettiest/fonts`, no system install needed).
 
-`install` is idempotent and backs up anything it touches (`~/.zshrc`, `~/.gitconfig`, `starship.toml`).
-Then restart your shell, and set your terminal font to **MesloLGS Nerd Font**.
+Aliases: `ls`/`ll`→eza, `cat`→bat, `grep`→rg, `du`→dust, `df`→duf (disable per-shell with `export PRETTIEST_NO_ALIASES=1`). zoxide adds `z`/`zi`; fzf binds `Ctrl-R`/`Ctrl-T`/`Alt-C`.
 
-## Commands
+## Build it (on a connected machine, once)
+
+Requires Go + cargo (for `cargo-binstall`). Binaries are **per-OS/arch** — build one per target:
 
 ```sh
-prettiest install              # tools + themes + shell/git wiring
-prettiest theme <colorway>     # catppuccin (default) · gruvbox · tokyonight · mono
-prettiest doctor               # what's installed / wired / missing
-prettiest uninstall            # remove wiring + configs (keeps the tools)
+make darwin     # → dist/prettiest-darwin-arm64
+make linux      # → dist/prettiest-linux-amd64
+make all        # both
 ```
 
-## How it works
-
-- **Aliases (shadowing):** `prettiest.sh` aliases `ls`/`ll`→eza, `cat`→bat, `grep`→rg, `du`→dust, `df`→duf.
-  `cd`/`ps`/`top` are left native; zoxide adds `z`/`zi` alongside `cd`.
-  Opt out per-shell with `export PRETTIEST_NO_ALIASES=1` before it's sourced.
-- **One source line** is added to `~/.zshrc`/`~/.bashrc`; it sources `~/.config/prettiest/prettiest.sh`,
-  which sets the theme env, aliases, and inits starship/zoxide/fzf for your shell.
-- **Colorways** (`catppuccin` · `gruvbox` · `tokyonight` · `mono`, matching system-hud) ship as
-  inline starship palettes; `prettiest theme <name>` recolors prompt + bat + delta + btop + fzf together.
-  Catppuccin theme files for bat/btop/delta are fetched from upstream at install; the other colorways
-  use the tools' built-in themes.
-- **git diffs** route through delta via an `[include]` added to `~/.gitconfig`.
+`make <target>` runs `build/fetch.sh` (downloads prebuilt tool binaries + the Nerd Font into `assets/`) then `go build` with the matching `GOOS/GOARCH`. The fetched payload (`assets/bin/`, `assets/fonts/`) is git-ignored — only source, configs, and themes are committed. Carry the resulting `dist/` binary to the target via scp/USB.
 
 ## Layout
 
 ```
 prettiest/
-  bin/prettiest        # install · theme · doctor · uninstall
-  Brewfile             # macOS toolset
-  packages.txt         # Linux apt/cargo map
-  install.sh           # bootstrap → bin/prettiest install
-  config/
-    prettiest.sh       # shell integration (aliases, env, init)
-    starship.toml      # plain full-path prompt (4 colorway palettes embedded)
-    bat/config         # bat defaults
-    delta/             # active + fetched Catppuccin gitconfig (created on install)
+  main.go                 # CLI: install · theme · doctor · uninstall
+  embed_darwin_arm64.go   # //go:embed assets/bin/darwin_arm64  (build-tag gated)
+  embed_linux_amd64.go    # //go:embed assets/bin/linux_amd64
+  assets.go               # //go:embed assets/config assets/fonts assets/wezterm
+  assets/
+    config/               # prettiest.sh, starship.toml, bat/, btop/, delta/  (committed)
+    bin/<target>/         # tool binaries  (fetched, git-ignored)
+    fonts/                # Nerd Font ttf  (fetched, git-ignored)
+    wezterm/wezterm.lua   # optional portable config
+  build/fetch.sh          # populate assets/ for a target
+  Makefile
+  skills/prettiest-config # how to reconfigure prompt / colorway / aliases
 ```
 
 ## Notes & limits
 
-- macOS-first (Homebrew). Linux is best-effort; on Debian, `bat`→`batcat` and `fd`→`fdfind` are aliased back automatically.
-- Four colorways (`catppuccin`/`gruvbox`/`tokyonight`/`mono`). Prompt + bat + fzf are fully themed per
-  colorway; btop/delta are best-effort for the non-catppuccin ones (tool built-in themes).
-- Not affiliated with Prettier or Catppuccin — just standing on their shoulders.
+- One binary per OS/arch (darwin-arm64, linux-amd64 today; add triples in `Makefile`/`fetch.sh`).
+- Size ≈ 60–75 MB (a dozen binaries + a font, embedded).
+- `procs` has no linux-gnu prebuilt and isn't bundled on Linux; `btop` is Linux-only here.
+- WezTerm itself is installed normally per machine — prettiest ships the *config*, not WezTerm.
+- Tools, font, and themes are all redistributable (MIT/Apache/OFL).
