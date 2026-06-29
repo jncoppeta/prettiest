@@ -4,9 +4,38 @@
 
 Built for **reusable, disconnected environments**: install WezTerm once per machine, drop the `prettiest` binary, run it. Everything it needs is embedded inside the binary.
 
+## Quick start
+
+**On the target machine (offline):**
+
+```sh
+# 1. get the binary for your platform (release download, or build — see below), then:
+chmod +x prettiest-*           # if downloaded
+./prettiest-darwin-arm64 install     # or prettiest-linux-amd64
+# 2. restart your shell (or: source ~/.config/prettiest/prettiest.sh)
+# 3. set your terminal font to "MesloLGS Nerd Font" for icons
 ```
-$ prettiest install
+
+That's it — modern tools, prompt, themes, and font are live. Try `ll`, `cat <file>`, `z`, `git diff`.
+
+```sh
+prettiest theme gruvbox        # recolor everything (catppuccin·gruvbox·tokyonight·mono)
+prettiest doctor               # what's installed / wired
+prettiest uninstall            # undo (keeps system fonts)
 ```
+
+**To get the binary — build it once on a connected machine** (needs Go + cargo):
+
+```sh
+git clone https://github.com/jncoppeta/prettiest.git && cd prettiest
+make darwin        # → dist/prettiest-darwin-arm64
+make linux         # → dist/prettiest-linux-amd64
+```
+
+Then scp/USB the `dist/` binary to the target. No network needed there ever again.
+
+> Prefer not to install your shell rc yet? `prettiest install --no-wire` unpacks everything
+> but touches nothing — test it in one shell with `. ~/.config/prettiest/prettiest.sh`.
 
 ## What's inside the binary
 
